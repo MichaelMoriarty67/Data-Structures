@@ -2,11 +2,11 @@
 -------------------------------------------------------
 Linked version of the list ADT.
 -------------------------------------------------------
-Author:  David Brown
-ID:      999999999
-Email:   dbrown@wlu.ca
+Author:  Michael Moriarty
+ID:      170409170
+Email:   mori9170@mylaurier.ca
 Term:    Spring 2021
-__updated__ = "2021-06-23"
+__updated__ = "2021-07-06"
 -------------------------------------------------------
 """
 from copy import deepcopy
@@ -188,6 +188,50 @@ class List:
         if current is None:
             previous = None
             index = -1
+
+        return previous, current, index
+
+    def _linear_search_r(self, key):
+        """
+        -------------------------------------------------------
+        Searches for the first occurrence of key in the list.
+        Private helper methods - used only by other ADT methods.
+        (recursive version)
+        Use: p, c, i = self._linear_search(key)
+        -------------------------------------------------------
+        Parameters:
+            key - a partial data element (?)
+        Returns:
+            previous - pointer to the node previous to the node containing key (_List_Node)
+            current - pointer to the node containing key (_List_Node)
+            index - index of the node containing key, -1 if key not found (int)
+        -------------------------------------------------------
+        """
+        curr = self._front
+        prev = None
+        index = 0
+
+        def _linear_search_r_aux(index, prev, curr, key):
+            if curr is None or curr._value == key:
+                    # key not found
+                if curr is None:
+                    index = -1
+                    # prev = None
+                    # p = prev
+                    # c = curr
+                # key found
+                # if curr == key:
+                #     p = prev
+                #     c = curr
+
+            else:
+                curr, prev, index = _linear_search_r_aux(
+                    index + 1, curr, curr._next, key)
+
+            return curr, prev, index
+
+        current, previous, index = _linear_search_r_aux(
+            index, prev, curr, key)
 
         return previous, current, index
 
@@ -608,10 +652,21 @@ class List:
                 other in the same order, otherwise False.
         -------------------------------------------------------
         """
-        # your code here
-        return
 
-    def identical_r(self, other):
+        if self._count != other._count:
+            identical = False
+        else:
+            source_node = self._front
+            target_node = other._front
+
+            while source_node is not None and source_node._value == target_node._value:
+                source_node = source_node._next
+                target_node = target_node._next
+
+            identical = source_node is None
+        return identical
+
+    def is_identical_r(self, other):
         """
         ---------------------------------------------------------
         Determines whether two lists are identical. 
@@ -625,8 +680,31 @@ class List:
                 as other in the same order, otherwise False.
         -------------------------------------------------------
         """
-        # your code here
-        return
+        if self._count != other._count:
+            print("here")
+            identical = False
+
+        else:
+            print("passed")
+
+            def is_identical_aux_r(source_node, target_node):
+                # base cases
+                if source_node is None:
+                    identical = True
+
+                elif source_node._value != target_node._value:
+                    identical = False
+
+                # recursive call
+                else:
+                    identical = is_identical_aux_r(
+                        source_node._next, target_node._next)
+
+                return identical
+
+            identical = is_identical_aux_r(self._front, other._front)
+
+        return identical
 
     def split(self):
         """
@@ -674,25 +752,6 @@ class List:
             even - the even numbered elements of the list (List)
             odd - the odd numbered elements of the list (List)
                 The List is empty.
-        -------------------------------------------------------
-        """
-        # your code here
-        return
-
-    def _linear_search_r(self, key):
-        """
-        -------------------------------------------------------
-        Searches for the first occurrence of key in the list.
-        Private helper methods - used only by other ADT methods.
-        (recursive version)
-        Use: p, c, i = self._linear_search(key)
-        -------------------------------------------------------
-        Parameters:
-            key - a partial data element (?)
-        Returns:
-            previous - pointer to the node previous to the node containing key (_List_Node)
-            current - pointer to the node containing key (_List_Node)
-            index - index of the node containing key, -1 if key not found (int)
         -------------------------------------------------------
         """
         # your code here

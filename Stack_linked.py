@@ -2,11 +2,11 @@
 -------------------------------------------------------
 Linked version of the Stack ADT.
 -------------------------------------------------------
-Author:  David Brown
-ID:      999999999
-Email:   dbrown@wlu.ca
-Section: CP164 C
-__updated__ = "2019-04-27"
+Author:  Michael Moriarty
+ID:      170409170
+Email:   Mori9170@mylaurier.ca
+Section: CP164 A
+__updated__ = "2021-07-06"
 -------------------------------------------------------
 """
 from copy import deepcopy
