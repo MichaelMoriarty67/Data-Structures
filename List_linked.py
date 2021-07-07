@@ -6,7 +6,7 @@ Author:  Michael Moriarty
 ID:      170409170
 Email:   mori9170@mylaurier.ca
 Term:    Spring 2021
-__updated__ = "2021-07-06"
+__updated__ = "2021-07-07"
 -------------------------------------------------------
 """
 from copy import deepcopy
@@ -216,13 +216,6 @@ class List:
                     # key not found
                 if curr is None:
                     index = -1
-                    # prev = None
-                    # p = prev
-                    # c = curr
-                # key found
-                # if curr == key:
-                #     p = prev
-                #     c = curr
 
             else:
                 curr, prev, index = _linear_search_r_aux(
@@ -525,7 +518,17 @@ class List:
             to their order before the method was called.
         -------------------------------------------------------
         """
-        # your code here
+        self._rear = self._front
+        previous = None
+        current = self._front
+
+        while current is not None:
+            temp = current._next
+            current._next = previous
+            previous = current
+            current = temp
+
+        self._front = previous
         return
 
     def reverse_r(self):
@@ -540,7 +543,27 @@ class List:
             to their order before the method was called.
         -------------------------------------------------------
         """
-        # your code here
+        self._rear = self._front
+        prev = None
+        curr = self._front
+
+        def reverse_r_aux(curr, prev):
+            # base case
+            if curr is None:
+                True
+
+            # recursive call
+            else:
+                reverse_r_aux(curr._next, curr)
+                # or if curr == self._rear (?)
+                if curr._next is None:
+                    self._front = curr
+                curr._next = prev
+
+            return
+
+        reverse_r_aux(curr, prev)
+
         return
 
     def clean(self):
@@ -735,8 +758,18 @@ class List:
             target2 - contains other alternating values from source (List)
         -------------------------------------------------------
         """
-        # your code here
-        return
+        target1 = List()
+        target2 = List()
+        left = True
+
+        while self._front is not None:
+
+            if left:
+                target1._move_front_to_rear(self)
+            else:
+                target2._move_front_to_rear(self)
+            left = not left
+        return target1, target2
 
     def split_alt_r(self):
         """
@@ -754,8 +787,78 @@ class List:
                 The List is empty.
         -------------------------------------------------------
         """
-        # your code here
-        return
+        even = List()
+        odd = List()
+        curr = self._front
+        prev = None
+        index = 0
+
+        def split_alt_aux_r(index, curr, prev):
+
+            # base case
+            if curr is None:
+                index = self._count
+
+            # recursive call
+            else:
+                index = split_alt_aux_r(index, curr._next, curr) - 1
+                # even
+                if index % 2 == 0:
+                    if even._count == 0:
+                        even._front = curr
+                        even._rear = even._front
+                        even._count += 1
+                        if prev is None:
+                            self._front = None
+                            self._count -= 1
+                            self._rear = None
+                        else:
+                            self._rear = prev
+                            prev._next = None
+                            self._count -= 1
+                    else:
+                        curr._next = even._front
+                        even._front = curr
+                        even._count += 1
+                        if prev is None:
+                            self._front = None
+                            self._count -= 1
+                            self._rear = None
+                        else:
+                            self._rear = prev
+                            prev._next = None
+                            self._count -= 1
+                else:
+                    # odd
+                    if odd._count == 0:
+                        odd._front = curr
+                        odd._rear = odd._front
+                        odd._count += 1
+                        if prev is None:
+                            self._front = None
+                            self._count -= 1
+                            self._rear = None
+                        else:
+                            self._rear = prev
+                            prev._next = None
+                            self._count -= 1
+                    else:
+                        curr._next = odd._front
+                        odd._front = curr
+                        odd._count += 1
+                        if prev is None:
+                            self._front = None
+                            self._count -= 1
+                            self._rear = None
+                        else:
+                            self._rear = prev
+                            prev._next = None
+                            self._count -= 1
+            return index
+
+        split_alt_aux_r(index, curr, prev)
+
+        return even, odd
 
     def intersection(self, source1, source2):
         """
@@ -773,7 +876,21 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        source1_node = source1._front
+
+        while source1_node is not None:
+            value = source1_node._value
+            _, current, _ = source2._linear_search(value)
+
+            if current is not None:
+                # Value exists in both source lists.
+                _, current, _ = self._linear_search(value)
+
+                if current is None:
+                    # Value does not appear in target list.
+                    self.append(value)
+
+            source1_node = source1_node._next
         return
 
     def intersection_r(self, source1, source2):
@@ -792,7 +909,31 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        current = source1._front
+
+        def intersection_r_aux(curr):
+            # base case
+            if curr is None:
+                True
+            # recursive call
+            else:
+                intersection_r_aux(curr._next)
+                # gets value, searches both source2 and
+                # self. If in former and not in ladder,
+                # appends a node with same value as value
+                value = curr._value
+                srch_t = source2._linear_search_r(value)
+                if srch_t[2] > -1:
+                    srch = self._linear_search_r(value)
+                    if srch[2] == -1:
+                        self._front = _List_Node(value, self._front)
+                        self._count += 1
+                        if self._rear is None:
+                            self._rear = self._front
+            return
+
+        intersection_r_aux(current)
+
         return
 
     def union(self, source1, source2):
@@ -811,7 +952,28 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        source1_node = source1._front
+
+        while source1_node is not None:
+            value = source1_node._value
+            _, current, _ = self._linear_search(value)
+
+            if current is None:
+                # Value does not exist in new list.
+                self.append(value)
+            source1_node = source1_node._next
+
+        source2_node = source2._front
+
+        while source2_node is not None:
+            value = source2_node._value
+            _, current, _ = self._linear_search(value)
+
+            if current is None:
+                # Value does not exist in current list.
+                self.append(value)
+
+            source2_node = source2_node._next
         return
 
     def union_r(self, source1, source2):
@@ -830,7 +992,43 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        source1_node = source1._front
+        source2_node = source2._front
+
+        # works but BAD algo, fix to make Big-O better
+        def union_r_aux(source1_node, source2_node):
+            # base case / when at end of both linked lists
+            if source1_node is None and source2_node is None:
+                True
+
+            # recursive call
+            else:
+
+                if source1_node is not None:
+                    print("calling 1")
+                    union_r_aux(source1_node._next, source2_node)
+                    value = source1_node._value
+                    srch = self._linear_search_r(value)
+                    if srch[2] == -1:
+                        self._front = _List_Node(value, self._front)
+                        self._count += 1
+                        if self._rear is None:
+                            self._rear = self._front
+
+                if source2_node is not None:
+                    print("calling 2")
+                    union_r_aux(source1_node, source2_node._next)
+                    value = source2_node._value
+                    srch = self._linear_search_r(value)
+                    if srch[2] == -1:
+                        self._front = _List_Node(value, self._front)
+                        self._count += 1
+                        if self._rear is None:
+                            self._rear = self._front
+            return
+
+        union_r_aux(source1_node, source2_node)
+
         return
 
     def clean_r(self):
