@@ -6,7 +6,7 @@ Author:  Michael Moriarty
 ID:      170409170
 Email:   mori9170@mylaurier.ca
 Term:    Spring 2021
-__updated__ = "2021-07-07"
+__updated__ = "2021-07-08"
 -------------------------------------------------------
 """
 from copy import deepcopy
@@ -274,8 +274,16 @@ class List:
         """
         assert self._front is not None, "Cannot remove from an empty list"
 
-        # your code here
-        return
+        value = deepcopy(self._front._value)
+
+        self._front = self._front._next
+
+        self._count -= 1
+
+        if self._count == 0:
+            self._rear = None
+
+        return value
 
     def remove_many(self, key):
         """
@@ -289,7 +297,44 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        curr = self._front
+        prev = None
+
+        while curr is not None:
+            # if node has value of key
+            if curr._value == key:
+
+                # if removing from front of list
+                if prev is None:
+                    print(prev)
+                    print(self._front)
+                    self._front = self._front._next
+                    self._count -= 1
+
+                    # if list now empty, update rear
+                    if self._count == 0:
+                        self._rear = None
+
+                    curr = curr._next
+
+                # prev has next value, set it to curr next
+                # don't update prev
+                else:
+                    prev._next = curr._next
+                    curr = curr._next
+
+                    # if just removed last element, update rear
+                    if curr is None:
+                        self._rear = prev
+
+                    self._count -= 1
+
+            # node doesn't have key value, got to next node
+            else:
+                temp = curr
+                curr = curr._next
+                prev = temp
+
         return
 
     def find(self, key):
@@ -578,7 +623,27 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+        lst = []
+        curr = self._front
+        prev = None
+
+        while curr is not None:
+            if curr._value not in lst:
+                lst.append(curr._value)
+                print(lst)
+
+                # move to the next node and update prev
+                temp = curr
+                curr = curr._next
+                prev = temp
+
+            else:
+                prev._next = curr._next
+                self._count -= 1
+
+                # move to next node without changing prev
+                curr = curr._next
+
         return
 
     def pop(self, *args):
@@ -741,8 +806,50 @@ class List:
             target2 - a new List with <= 50% of the original List (List)
         -------------------------------------------------------
         """
-        # your code here
-        return
+        count = (self._count // 2) + (self._count % 2 > 0)
+        print(count)
+        i = 0
+        target1 = List()
+        target2 = List()
+
+        while self._front is not None:
+            if i < count:
+                if target1._count == 0:
+                    target1._front = self._front
+                    self._front = self._front._next
+                    target1._rear = target1._front
+                    self._count -= 1
+                    target1._count += 1
+                else:
+                    target1._rear._next = self._front
+                    self._front = self._front._next
+                    target1._rear = target1._rear._next
+                    target1._rear._next = None
+                    self._count -= 1
+                    target1._count += 1
+
+                i += 1
+
+            else:
+                if target2._count == 0:
+                    target2._front = self._front
+                    self._front = self._front._next
+                    target2._rear = target2._front
+                    self._count -= 1
+                    target2._count += 1
+                else:
+                    target2._rear._next = self._front
+                    self._front = self._front._next
+                    target2._rear = target2._rear._next
+                    target2._rear._next = None
+                    self._count -= 1
+                    target2._count += 1
+
+                i += 1
+
+        self._rear = None
+
+        return target1, target2
 
     def split_alt(self):
         """
@@ -760,15 +867,39 @@ class List:
         """
         target1 = List()
         target2 = List()
-        left = True
 
         while self._front is not None:
-
-            if left:
-                target1._move_front_to_rear(self)
+            if target1._count == 0:
+                target1._front = self._front
+                self._front = self._front._next
+                target1._rear = target1._front
+                self._count -= 1
+                target1._count += 1
             else:
-                target2._move_front_to_rear(self)
-            left = not left
+                target1._rear._next = self._front
+                self._front = self._front._next
+                target1._rear = target1._rear._next
+                target1._rear._next = None
+                self._count -= 1
+                target1._count += 1
+
+            if self._front is not None:
+                if target2._count == 0:
+                    target2._front = self._front
+                    self._front = self._front._next
+                    target2._rear = target2._front
+                    self._count -= 1
+                    target2._count += 1
+                else:
+                    target2._rear._next = self._front
+                    self._front = self._front._next
+                    target2._rear = target2._rear._next
+                    target2._rear._next = None
+                    self._count -= 1
+                    target2._count += 1
+
+        self._rear = None
+
         return target1, target2
 
     def split_alt_r(self):
@@ -1141,7 +1272,51 @@ class List:
             None
         -------------------------------------------------------
         """
-        # your code here
+
+        while source1._front is not None or source2._front is not None:
+
+            if source1._front is not None:
+
+                # check for first insertion
+                if self._count == 0:
+                    self._front = source1._front
+                    source1._front = source1._front._next
+                    self._front._next = None
+                    self._rear = self._front
+                    self._count += 1
+                    source1._count -= 1
+                else:
+                    # append at end of linked list
+                    self._rear._next = source1._front
+                    source1._front = source1._front._next
+                    self._rear = self._rear._next
+                    self._rear._next = None
+                    self._count += 1
+                    source1._count -= 1
+
+            if source2._front is not None:
+
+                # check for first insertion
+                if self._count == 0:
+                    self._front = source2._front
+                    source2._front = source2._front._next
+                    self._front._next = None
+                    self._rear = self._front
+                    self._count += 1
+                    source2._count -= 1
+                else:
+                    # append at end of linked list
+                    self._rear._next = source2._front
+                    source2._front = source2._front._next
+                    self._rear = self._rear._next
+                    self._rear._next = None
+                    self._count += 1
+                    source2._count -= 1
+
+        # update front and rear of empty lists
+        source1._rear = None
+        source2._rear = None
+
         return
 
     def combine_r(self, source1, source2):
